@@ -83,7 +83,7 @@
         <!-- Login Section -->
         <div id="login-section" class="min-h-screen flex items-center justify-center" id="login-section-container">
             <div class="max-w-md w-full">
-                <div class="bg-white p-8 rounded-xl shadow-2xl">
+                <div id="login-card" class="bg-white p-8 rounded-xl shadow-2xl">
                     <h1 class="text-3xl font-bold text-center text-slate-800 mb-2 font-consolas">RM Enterprise Inventory System</h1>
                     <p class="text-center text-slate-500 mb-8">Sign in to manage your hardware shop</p>
                     <div id="auth-error" class="text-red-500 text-center mb-4 hidden"></div>
@@ -166,6 +166,7 @@
                                     <th class="px-5 py-3 border-b-2 border-slate-200 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Item Name</th>
                                     <th class="px-5 py-3 border-b-2 border-slate-200 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">SKU</th>
                                     <th class="px-5 py-3 border-b-2 border-slate-200 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider">Stock</th>
+                                    <th class="px-5 py-3 border-b-2 border-slate-200 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider">Size</th>
                                     <th class="px-5 py-3 border-b-2 border-slate-200 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider">Price</th>
                                     <th class="px-5 py-3 border-b-2 border-slate-200 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
                                 </tr>
@@ -218,9 +219,23 @@
                 <div class="mb-4"><label for="item-name" class="block text-slate-700 text-sm font-bold mb-2">Item Name</label><input type="text" id="item-name" class="shadow-sm appearance-none border border-slate-300 rounded-lg w-full py-2 px-3 text-slate-700" required></div>
                 <div class="mb-4"><label for="item-category" class="block text-slate-700 text-sm font-bold mb-2">Category</label><input type="text" id="item-category" class="shadow-sm appearance-none border border-slate-300 rounded-lg w-full py-2 px-3 text-slate-700" placeholder="e.g., Power Tools" required></div>
                 <div class="mb-4"><label for="item-sku" class="block text-slate-700 text-sm font-bold mb-2">SKU (auto-generated)</label><input type="text" id="item-sku" class="shadow-sm appearance-none border border-slate-300 rounded-lg w-full py-2 px-3 text-slate-700 bg-slate-100" required></div>
-                <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="grid grid-cols-2 gap-4 mb-4">
                     <div><label for="item-quantity" class="block text-slate-700 text-sm font-bold mb-2">Quantity</label><input type="number" id="item-quantity" class="shadow-sm appearance-none border border-slate-300 rounded-lg w-full py-2 px-3 text-slate-700" required min="0"></div>
                     <div><label for="item-price" class="block text-slate-700 text-sm font-bold mb-2">Price (৳)</label><input type="number" id="item-price" class="shadow-sm appearance-none border border-slate-300 rounded-lg w-full py-2 px-3 text-slate-700" required min="0" step="0.01"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div><label for="item-size" class="block text-slate-700 text-sm font-bold mb-2">Size (Optional)</label><input type="number" id="item-size" class="shadow-sm appearance-none border border-slate-300 rounded-lg w-full py-2 px-3 text-slate-700" step="any"></div>
+                    <div>
+                        <label for="item-unit" class="block text-slate-700 text-sm font-bold mb-2">Unit</label>
+                        <select id="item-unit" class="shadow-sm appearance-none border border-slate-300 rounded-lg w-full py-2 px-3 text-slate-700 bg-white">
+                            <option value="">N/A</option>
+                            <option value="inch">inch</option>
+                            <option value="mm">mm</option>
+                            <option value="cm">cm</option>
+                            <option value="feet">feet</option>
+                            <option value="meter">meter</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="flex justify-end space-x-4">
                     <button type="button" id="cancel-btn" class="btn bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-4 rounded-lg">Cancel</button>
@@ -258,14 +273,14 @@
     <!-- Firebase SDK -->
     <script type="module">
         // --- Firebase Configuration ---
-      const firebaseConfig = {
-  apiKey: "AIzaSyCTyhpmv2ccM8OQIWaPJ2ZR7AKgDOGdZsc",
-  authDomain: "rm-enterprise-inventory.firebaseapp.com",
-  projectId: "rm-enterprise-inventory",
-  storageBucket: "rm-enterprise-inventory.firebasestorage.app",
-  messagingSenderId: "343379662698",
-  appId: "1:343379662698:web:3cb825dcddd1aae0df3713"
-};
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
         // --- Firebase Imports ---
@@ -274,6 +289,19 @@
         import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, query, where, Timestamp, runTransaction, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Firebase Initialization ---
+        if (firebaseConfig.apiKey === "YOUR_API_KEY" && typeof __firebase_config === 'undefined') {
+            const loginCard = document.getElementById('login-card');
+            if(loginCard) {
+                loginCard.innerHTML = `
+                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg" role="alert">
+                        <p class="font-bold">Configuration Error</p>
+                        <p>Your Firebase configuration is missing. Please follow the setup steps to copy and paste your project's keys into the HTML file before deploying.</p>
+                    </div>
+                `;
+            }
+            throw new Error("Firebase config is not set. Please replace placeholder keys.");
+        }
+        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -458,13 +486,13 @@
             const sortedCategories = Object.keys(grouped).sort();
 
             if (filteredItems.length === 0 && allItems.length > 0) {
-                html = `<tr><td colspan="5" class="text-center p-8 text-slate-500">No items match your search or filter.</td></tr>`;
+                html = `<tr><td colspan="6" class="text-center p-8 text-slate-500">No items match your search or filter.</td></tr>`;
             } else {
                 sortedCategories.forEach(category => {
                     const categorySafe = category.replace(/"/g, '&quot;');
                     html += `
                         <tr class="sticky-category-header">
-                            <th colspan="5" class="px-5 py-2 text-left text-sm font-semibold text-slate-700 border-b-2 border-slate-300 bg-slate-100">
+                            <th colspan="6" class="px-5 py-2 text-left text-sm font-semibold text-slate-700 border-b-2 border-slate-300 bg-slate-100">
                                 <div class="flex justify-between items-center">
                                     <span>${category}</span>
                                     <button data-category="${category === 'Uncategorized' ? '' : categorySafe}" class="add-to-category-btn bg-indigo-100 text-indigo-600 hover:bg-indigo-200 text-xs font-bold py-1 px-3 rounded-full flex items-center transition-colors">
@@ -481,6 +509,7 @@
                                 <td class="px-5 py-4 bg-white text-sm"><p class="text-slate-900 whitespace-no-wrap font-medium">${item.name}</p></td>
                                 <td class="px-5 py-4 bg-white text-sm"><p class="text-slate-600 whitespace-no-wrap">${item.sku}</p></td>
                                 <td class="px-5 py-4 bg-white text-sm text-center"><span class="font-semibold ${item.quantity < 10 ? 'text-red-600' : 'text-slate-800'}">${item.quantity}</span></td>
+                                <td class="px-5 py-4 bg-white text-sm text-center"><p class="text-slate-600 whitespace-no-wrap">${item.size && item.unit ? `${item.size} ${item.unit}` : 'N/A'}</p></td>
                                 <td class="px-5 py-4 bg-white text-sm text-right"><p class="text-slate-900 whitespace-no-wrap font-semibold">৳${parseFloat(item.price).toFixed(2)}</p></td>
                                 <td class="px-5 py-4 bg-white text-sm text-center">
                                     <div class="flex items-center justify-center space-x-2">
@@ -685,6 +714,8 @@
                 itemCategoryInput.value = item.category;
                 itemForm.querySelector('#item-quantity').value = item.quantity;
                 itemForm.querySelector('#item-price').value = item.price;
+                itemForm.querySelector('#item-size').value = item.size || '';
+                itemForm.querySelector('#item-unit').value = item.unit || '';
             } else { // Adding a new item
                 if (category) {
                     itemCategoryInput.value = category;
@@ -705,9 +736,11 @@
             const itemData = {
                 name: itemForm.querySelector('#item-name').value,
                 sku: itemSkuInput.value,
-                category: itemCategoryInput.value,
+                category: itemForm.querySelector('#item-category').value,
                 quantity: parseInt(itemForm.querySelector('#item-quantity').value),
-                price: parseFloat(itemForm.querySelector('#item-price').value)
+                price: parseFloat(itemForm.querySelector('#item-price').value),
+                size: itemForm.querySelector('#item-size').value,
+                unit: itemForm.querySelector('#item-unit').value
             };
             
             closeModal(); // Optimistic UI: close modal immediately
@@ -816,4 +849,3 @@
     </script>
 </body>
 </html>
-

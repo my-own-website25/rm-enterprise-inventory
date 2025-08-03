@@ -380,7 +380,10 @@
                 reportDateInput.valueAsDate = new Date();
                 fetchSalesReport();
             } else {
+                // BUG FIX: Clear local data on logout
                 currentUserId = null;
+                allItems = [];
+                dailySales = [];
                 loginSection.classList.remove('hidden');
                 mainContent.classList.add('hidden');
                 if (unsubscribeInventoryListener) unsubscribeInventoryListener();

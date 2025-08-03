@@ -273,14 +273,15 @@
     <!-- Firebase SDK -->
     <script type="module">
         // --- Firebase Configuration ---
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
+          const firebaseConfig = {
+  apiKey: "AIzaSyCTyhpmv2ccM8OQIWaPJ2ZR7AKgDOGdZsc",
+  authDomain: "rm-enterprise-inventory.firebaseapp.com",
+  projectId: "rm-enterprise-inventory",
+  storageBucket: "rm-enterprise-inventory.firebasestorage.app",
+  messagingSenderId: "343379662698",
+  appId: "1:343379662698:web:3cb825dcddd1aae0df3713"
+};
+
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
         // --- Firebase Imports ---
@@ -849,3 +850,4 @@
     </script>
 </body>
 </html>
+

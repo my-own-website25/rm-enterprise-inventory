@@ -273,7 +273,7 @@
     <!-- Firebase SDK -->
     <script type="module">
         // --- Firebase Configuration ---
-const firebaseConfig = {
+   const firebaseConfig = {
   apiKey: "AIzaSyCTyhpmv2ccM8OQIWaPJ2ZR7AKgDOGdZsc",
   authDomain: "rm-enterprise-inventory.firebaseapp.com",
   projectId: "rm-enterprise-inventory",
@@ -590,7 +590,9 @@ const firebaseConfig = {
                     <td class="px-5 py-4 bg-white text-sm text-center">${sale.quantitySold}</td>
                     <td class="px-5 py-4 bg-white text-sm text-right">৳${parseFloat(sale.totalPrice).toFixed(2)}</td>
                     <td class="px-5 py-4 bg-white text-sm text-center">
-                        <button data-id="${sale.id}" data-itemid="${sale.inventoryItemId}" data-qty="${sale.quantitySold}" class="revert-sale-btn text-red-500 hover:text-red-700 font-medium">Revert</button>
+                        <button data-id="${sale.id}" data-itemid="${sale.inventoryItemId}" data-qty="${sale.quantitySold}" class="delete-sale-btn text-slate-500 hover:text-red-600 p-1 rounded-md transition-colors" title="Delete Sale">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                        </button>
                     </td>
                 `;
                 salesReportBody.appendChild(row);
@@ -643,8 +645,8 @@ const firebaseConfig = {
 
         salesReportBody.addEventListener('click', (e) => {
             const target = e.target.closest('button');
-            if (!target || !target.classList.contains('revert-sale-btn')) return;
-            revertSale(target.dataset.id, target.dataset.itemid, parseInt(target.dataset.qty));
+            if (!target || !target.classList.contains('delete-sale-btn')) return;
+            deleteSaleAndRevertStock(target.dataset.id, target.dataset.itemid, parseInt(target.dataset.qty));
         });
 
         // --- CRUD and Sale Functions ---
@@ -658,7 +660,7 @@ const firebaseConfig = {
             }
         }
 
-        async function revertSale(saleId, inventoryItemId, quantityToRevert) {
+        async function deleteSaleAndRevertStock(saleId, inventoryItemId, quantityToRevert) {
             const inventoryItemRef = doc(inventoryCollectionRef, inventoryItemId);
             const saleRef = doc(salesCollectionRef, saleId);
             try {
@@ -670,10 +672,10 @@ const firebaseConfig = {
                     transaction.update(inventoryItemRef, { quantity: newQuantity });
                     transaction.delete(saleRef);
                 });
-                showNotification("Sale reverted successfully.");
+                showNotification("Sale record deleted and stock restored.");
             } catch (error) {
                 console.error("Transaction failed: ", error);
-                showNotification("Failed to revert sale. The inventory item may have been deleted.", 5000);
+                showNotification("Failed to delete sale. The inventory item may have been deleted.", 5000);
             }
         }
         
@@ -849,5 +851,3 @@ const firebaseConfig = {
     </script>
 </body>
 </html>
-
-

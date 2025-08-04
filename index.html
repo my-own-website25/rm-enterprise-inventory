@@ -84,20 +84,6 @@
                 box-shadow: 0 0 0 10px rgba(79, 70, 229, 0);
             }
         }
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            #print-area, #print-area * {
-                visibility: visible;
-            }
-            #print-area {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-            }
-        }
     </style>
 </head>
 <body class="antialiased">
@@ -155,7 +141,6 @@
                 <div class="border-b border-slate-200">
                     <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                         <button id="tab-inventory" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg tab-active">Inventory</button>
-                        <button id="tab-customers" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg tab-inactive">Customers</button>
                         <button id="tab-reports" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg tab-inactive">Sales Reports</button>
                     </nav>
                 </div>
@@ -203,17 +188,6 @@
                     <div id="loading-indicator" class="text-center p-8 text-slate-500">Loading inventory...</div>
                     <div id="no-items-message" class="text-center p-8 text-slate-500 hidden">No items in inventory.</div>
                 </div>
-            </div>
-
-            <!-- Customers View -->
-            <div id="customers-view" class="hidden">
-                 <div class="mb-4 flex flex-wrap gap-4 items-center">
-                    <button id="add-customer-btn" class="btn btn-primary font-bold py-2 px-4 rounded-lg shadow">Add New Customer</button>
-                 </div>
-                 <div id="customer-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Customer cards will be injected here -->
-                 </div>
-                 <div id="no-customers-message" class="text-center p-8 text-slate-500 hidden">No customers found.</div>
             </div>
 
             <!-- Sales Report View -->
@@ -303,81 +277,6 @@
         </div>
     </div>
 
-    <!-- Add/Edit Customer Modal -->
-    <div id="customer-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop hidden">
-         <div class="bg-white rounded-xl shadow-xl w-11/12 md:max-w-md mx-auto p-6 modal transform scale-95 opacity-0">
-            <h2 id="customer-modal-title" class="text-2xl font-bold mb-6 text-slate-800">Add New Customer</h2>
-            <form id="customer-form">
-                <input type="hidden" id="customer-id">
-                <div class="mb-4"><label for="customer-name" class="block text-slate-700 text-sm font-bold mb-2">Customer Name</label><input type="text" id="customer-name" class="shadow-sm appearance-none border border-slate-300 rounded-lg w-full py-2 px-3 text-slate-700" required></div>
-                <div class="mb-4"><label for="customer-address" class="block text-slate-700 text-sm font-bold mb-2">Address</label><input type="text" id="customer-address" class="shadow-sm appearance-none border border-slate-300 rounded-lg w-full py-2 px-3 text-slate-700"></div>
-                <div class="mb-4"><label for="customer-number" class="block text-slate-700 text-sm font-bold mb-2">Number</label><input type="text" id="customer-number" class="shadow-sm appearance-none border border-slate-300 rounded-lg w-full py-2 px-3 text-slate-700"></div>
-                <div class="mb-6"><label for="customer-shop" class="block text-slate-700 text-sm font-bold mb-2">Shop Name (Optional)</label><input type="text" id="customer-shop" class="shadow-sm appearance-none border border-slate-300 rounded-lg w-full py-2 px-3 text-slate-700"></div>
-                <div class="flex justify-end space-x-4">
-                    <button type="button" id="cancel-customer-btn" class="btn bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-4 rounded-lg">Cancel</button>
-                    <button type="submit" class="btn btn-primary font-bold py-2 px-4 rounded-lg">Save Customer</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-     <!-- Order Modal -->
-    <div id="order-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop hidden">
-        <div class="bg-white rounded-xl shadow-xl w-11/12 md:max-w-2xl mx-auto p-6 modal transform scale-95 opacity-0">
-            <h2 class="text-2xl font-bold mb-2 text-slate-800">New Order for <span id="order-customer-name"></span></h2>
-            <p class="text-sm text-slate-500 mb-6">Customer ID: <span id="order-customer-id"></span></p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Left side: Add items -->
-                <div>
-                    <h3 class="font-bold text-lg mb-2">Add Items to Order</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label for="order-item-select" class="block text-slate-700 text-sm font-bold mb-2">Select Item</label>
-                            <select id="order-item-select" class="w-full p-2 border border-slate-300 rounded-lg"></select>
-                        </div>
-                        <div>
-                            <label for="order-item-quantity" class="block text-slate-700 text-sm font-bold mb-2">Quantity</label>
-                            <input type="number" id="order-item-quantity" class="w-full p-2 border border-slate-300 rounded-lg" min="1" value="1">
-                        </div>
-                        <button id="add-to-order-btn" class="btn btn-primary w-full py-2">Add to Order</button>
-                    </div>
-                </div>
-                <!-- Right side: Current order -->
-                <div>
-                    <h3 class="font-bold text-lg mb-2">Current Order</h3>
-                    <div id="current-order-list" class="space-y-2 max-h-48 overflow-y-auto border p-2 rounded-lg">
-                        <!-- Order items will be injected here -->
-                    </div>
-                    <div class="mt-4">
-                         <div class="flex justify-between font-bold text-xl">
-                            <span>Total:</span>
-                            <span id="order-total">৳0.00</span>
-                        </div>
-                        <div class="mt-4">
-                            <label for="order-status" class="block text-slate-700 text-sm font-bold mb-2">Order Status</label>
-                            <select id="order-status" class="w-full p-2 border border-slate-300 rounded-lg">
-                                <option value="Pending">Pending</option>
-                                <option value="Paid">Paid</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex justify-between items-center mt-6">
-                <div>
-                    <button id="print-receipt-btn" class="btn bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-lg">Print Receipt</button>
-                </div>
-                <div class="space-x-4">
-                    <button type="button" id="cancel-order-btn" class="btn bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-4 rounded-lg">Cancel</button>
-                    <button id="save-order-btn" class="btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Save Order</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
     <!-- Notification Toast -->
     <div id="notification-toast" class="fixed bottom-5 right-5 bg-slate-800 text-white py-3 px-5 rounded-lg shadow-xl transform translate-y-20 opacity-0 transition-all duration-300">
         <p id="notification-message"></p>
@@ -387,8 +286,6 @@
         <p>Developed by Sheikh Istemam Ahmed Utsho</p>
         <p>E-mail: istemamahmed@outlook.com</p>
     </footer>
-    
-    <div id="print-area" class="hidden"></div>
 
     <!-- Firebase SDK -->
     <script type="module">
@@ -431,14 +328,9 @@
         let currentUserId = null;
         let inventoryCollectionRef = null;
         let salesCollectionRef = null;
-        let customersCollectionRef = null;
         let unsubscribeInventoryListener = null;
-        let unsubscribeCustomersListener = null;
         let allItems = [];
-        let allCustomers = [];
         let dailySales = [];
-        let currentOrder = [];
-        let currentCustomerForOrder = null;
 
         // --- DOM Elements ---
         const loginSection = document.getElementById('login-section');
@@ -446,10 +338,8 @@
         const logoutBtn = document.getElementById('logout-btn');
         const userInfo = document.getElementById('user-info');
         const tabInventory = document.getElementById('tab-inventory');
-        const tabCustomers = document.getElementById('tab-customers');
         const tabReports = document.getElementById('tab-reports');
         const inventoryView = document.getElementById('inventory-view');
-        const customersView = document.getElementById('customers-view');
         const reportsView = document.getElementById('reports-view');
         const addItemBtn = document.getElementById('add-item-btn');
         const inventoryTableBody = document.getElementById('inventory-table-body');
@@ -457,27 +347,6 @@
         const categoryFilter = document.getElementById('category-filter');
         const loadingIndicator = document.getElementById('loading-indicator');
         const noItemsMessage = document.getElementById('no-items-message');
-        
-        // Customer Elements
-        const addCustomerBtn = document.getElementById('add-customer-btn');
-        const customerList = document.getElementById('customer-list');
-        const noCustomersMessage = document.getElementById('no-customers-message');
-        const customerModal = document.getElementById('customer-modal');
-        const customerForm = document.getElementById('customer-form');
-        const customerIdInput = document.getElementById('customer-id');
-
-        // Order Elements
-        const orderModal = document.getElementById('order-modal');
-        const orderCustomerName = document.getElementById('order-customer-name');
-        const orderCustomerId = document.getElementById('order-customer-id');
-        const orderItemSelect = document.getElementById('order-item-select');
-        const orderItemQuantity = document.getElementById('order-item-quantity');
-        const addToOrderBtn = document.getElementById('add-to-order-btn');
-        const currentOrderList = document.getElementById('current-order-list');
-        const orderTotal = document.getElementById('order-total');
-        const orderStatus = document.getElementById('order-status');
-        const saveOrderBtn = document.getElementById('save-order-btn');
-        const printReceiptBtn = document.getElementById('print-receipt-btn');
         
         // Dashboard Stats Elements
         const statTotalValue = document.getElementById('stat-total-value');
@@ -522,12 +391,10 @@
                 currentUserId = user.uid;
                 inventoryCollectionRef = collection(db, `artifacts/${appId}/users/${currentUserId}/inventory`);
                 salesCollectionRef = collection(db, `artifacts/${appId}/users/${currentUserId}/sales`);
-                customersCollectionRef = collection(db, `artifacts/${appId}/users/${currentUserId}/customers`);
                 loginSection.classList.add('hidden');
                 mainContent.classList.remove('hidden');
                 userInfo.textContent = `Welcome, ${user.email}`;
                 setupInventoryListener();
-                setupCustomersListener();
                 reportDateInput.valueAsDate = new Date();
                 fetchSalesReport();
             } else {
@@ -536,11 +403,9 @@
                 currentUserId = null;
                 allItems = [];
                 dailySales = [];
-                allCustomers = [];
                 loginSection.classList.remove('hidden');
                 mainContent.classList.add('hidden');
                 if (unsubscribeInventoryListener) unsubscribeInventoryListener();
-                if (unsubscribeCustomersListener) unsubscribeCustomersListener();
             }
         });
         
@@ -559,23 +424,20 @@
         
         // --- Tab Navigation ---
         tabInventory.addEventListener('click', () => switchTab('inventory'));
-        tabCustomers.addEventListener('click', () => switchTab('customers'));
         tabReports.addEventListener('click', () => switchTab('reports'));
 
         function switchTab(tabName) {
-            const tabs = {
-                inventory: { view: inventoryView, btn: tabInventory },
-                customers: { view: customersView, btn: tabCustomers },
-                reports: { view: reportsView, btn: tabReports }
-            };
-
-            Object.values(tabs).forEach(tab => {
-                tab.view.classList.add('hidden');
-                tab.btn.classList.replace('tab-active', 'tab-inactive');
-            });
-
-            tabs[tabName].view.classList.remove('hidden');
-            tabs[tabName].btn.classList.replace('tab-inactive', 'tab-active');
+            if (tabName === 'inventory') {
+                inventoryView.classList.remove('hidden');
+                reportsView.classList.add('hidden');
+                tabInventory.classList.replace('tab-inactive', 'tab-active');
+                tabReports.classList.replace('tab-active', 'tab-inactive');
+            } else {
+                inventoryView.classList.add('hidden');
+                reportsView.classList.remove('hidden');
+                tabInventory.classList.replace('tab-active', 'tab-inactive');
+                tabReports.classList.replace('tab-inactive', 'tab-active');
+            }
         }
 
         // --- OPTIMIZED INVENTORY LOGIC ---
